@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1003231592462",
+    "project_id": "secrypt-7ca69",
+    "storage_bucket": "secrypt-7ca69.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003231592462:android:6b85d18445a7017d8c3c5f",
+        "android_client_info": {
+          "package_name": "com.example.secrypt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs2enGyEp7997MEDvzVd-wdYtEcyJ9o4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
