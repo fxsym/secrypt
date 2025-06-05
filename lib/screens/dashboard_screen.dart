@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:convert'; // untuk decode base64
+import 'dart:convert';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -11,6 +11,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   String? fullName;
   String? base64Image;
+  bool showOptions = false;
 
   @override
   void initState() {
@@ -36,8 +37,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -47,9 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 backgroundImage: MemoryImage(base64Decode(base64Image!)),
               )
             else
-              CircleAvatar(
-                child: Icon(Icons.person),
-              ),
+              CircleAvatar(child: Icon(Icons.person)),
             SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -66,11 +63,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
               await FirebaseAuth.instance.signOut();
               Navigator.pushReplacementNamed(context, '/login');
             },
-          )
+          ),
         ],
       ),
-      body: Center(
-        child: Text("Selamat datang di dashboard"),
+      body: Center(child: Text("Selamat datang di dashboard")),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end, // rata kanan
+        children: [
+          AnimatedSwitcher(
+            duration: Duration(milliseconds: 300),
+            child:
+                showOptions
+                    ? Column(
+                      key: ValueKey(true),
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        FloatingActionButton.extended(
+                          heroTag: 'textEncrypt',
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/add-text-encrypt');
+                          },
+                          icon: Icon(Icons.text_fields),
+                          label: Text("Tambah text enkripsi"),
+                        ),
+                        SizedBox(height: 10),
+                        FloatingActionButton.extended(
+                          heroTag: 'imageEncrypt',
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/add-image-encrypt');
+                          },
+                          icon: Icon(Icons.image),
+                          label: Text("Tambah gambar enkripsi"),
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    )
+                    : SizedBox.shrink(key: ValueKey(false)),
+          ),
+          FloatingActionButton(
+            heroTag: 'mainFab',
+            onPressed: () {
+              setState(() {
+                showOptions = !showOptions;
+              });
+            },
+            child: Icon(showOptions ? Icons.close : Icons.add),
+          ),
+        ],
       ),
     );
   }

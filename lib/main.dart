@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:secrypt/screens/add_image_ecrypt.dart';
+import 'package:secrypt/screens/add_text_encrypt.dart';
 import 'package:secrypt/screens/dashboard_screen.dart';
 import 'package:secrypt/screens/register_screen.dart';
 import 'screens/login_screen.dart';
@@ -26,6 +28,8 @@ class MyApp extends StatelessWidget {
         '/home': (_) => HomeScreen(),
         '/register': (_) => RegisterScreen(),
         '/dashboard': (_) => DashboardScreen(),
+        '/add-text-encrypt': (_) => AddTextEncryptScreen(),
+        '/add-image-encrypt': (_) => AddImageEncryptScreen(),
       },
     );
   }
