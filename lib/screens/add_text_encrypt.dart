@@ -14,6 +14,7 @@ class AddTextEncryptScreen extends StatefulWidget {
 class _AddTextEncryptScreenState extends State<AddTextEncryptScreen> {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _keyController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
 
   String? _encryptedText;
   bool _isLoading = false;
@@ -52,8 +53,9 @@ class _AddTextEncryptScreenState extends State<AddTextEncryptScreen> {
 
       if (user != null) {
         final firestore = FirebaseFirestore.instance;
-        await firestore.collection('texts').doc(user.uid).set({
+        await firestore.collection('texts').add({
           'user_id': user.uid,
+          'text_title': _titleController.text,
           'key_bytes': base64Encode(keyBytes),
           'encrypt_text': combined,
           'timestamp': FieldValue.serverTimestamp(),
@@ -87,8 +89,14 @@ class _AddTextEncryptScreenState extends State<AddTextEncryptScreen> {
         child: Column(
           children: [
             TextField(
+              controller: _titleController,
+              decoration: InputDecoration(labelText: 'Judul teks enkripsi'),
+            ),
+            TextField(
               controller: _textController,
               decoration: InputDecoration(labelText: 'Teks asli'),
+              minLines: 5,
+              maxLines: null, // Membuat tinggi mengikuti isi
             ),
             TextField(
               controller: _keyController,
@@ -98,9 +106,10 @@ class _AddTextEncryptScreenState extends State<AddTextEncryptScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _isLoading ? null : _encryptText,
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Text('Enkripsi dan Simpan'),
+              child:
+                  _isLoading
+                      ? CircularProgressIndicator()
+                      : Text('Enkripsi dan Simpan'),
             ),
             SizedBox(height: 20),
             if (_encryptedText != null) ...[
