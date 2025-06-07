@@ -40,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       final uid = authResult.user!.uid;
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      await FirebaseFirestore.instance.collection('users').add({
         'full_name': nameCtrl.text.trim(),
         'gender': gender,
         'phone_number': phoneCtrl.text.trim(),
@@ -64,9 +64,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.grey[300],
+              backgroundImage:
+                  base64Image != null
+                      ? MemoryImage(base64Decode(base64Image!))
+                      : null,
+              child:
+                  base64Image == null
+                      ? Icon(Icons.person, size: 60, color: Colors.white)
+                      : null,
+            ),
+            SizedBox(height: 10),
             ElevatedButton(
               onPressed: pickImage,
-              child: Text(base64Image == null ? "Pilih Foto" : "Foto Dipilih"),
+              child: Text(base64Image == null ? "Pilih Foto" : "Ganti Foto"),
             ),
             TextField(
               controller: nameCtrl,
@@ -97,6 +110,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 10),
             SizedBox(height: 20),
             ElevatedButton(onPressed: register, child: Text("Register")),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/login');
+              },
+              child: Text("Login"),
+            ),
           ],
         ),
       ),
