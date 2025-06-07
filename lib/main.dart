@@ -5,9 +5,10 @@ import 'package:secrypt/screens/add_text_encrypt.dart';
 import 'package:secrypt/screens/dashboard_screen.dart';
 import 'package:secrypt/screens/register_screen.dart';
 import 'package:secrypt/screens/text_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
-import 'firebase_options.dart'; // harus di-import
+import 'package:secrypt/screens/image_screen.dart';
+import 'package:secrypt/screens/login_screen.dart';
+import 'package:secrypt/screens/home_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,14 +34,30 @@ class MyApp extends StatelessWidget {
         '/add-image-encrypt': (_) => AddImageEncryptScreen(),
       },
       onGenerateRoute: (settings) {
-        if (settings.name != null && settings.name!.startsWith('/texts/')) {
-          final docId = settings.name!.replaceFirst('/texts/', '');
+        final uri = Uri.parse(settings.name!);
+
+        // Route untuk detail teks terenkripsi
+        if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'texts') {
+          final docId = uri.pathSegments[1];
           return MaterialPageRoute(
             builder: (_) => TextDetailScreen(docId: docId),
           );
         }
 
-        return null; // fallback jika route tidak ditemukan
+        // Route untuk detail gambar terenkripsi
+        if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'images') {
+          final docId = uri.pathSegments[1];
+          return MaterialPageRoute(
+            builder: (_) => ImageDetailScreen(docId: docId),
+          );
+        }
+
+        // Jika route tidak ditemukan
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(child: Text('Route tidak ditemukan')),
+          ),
+        );
       },
     );
   }

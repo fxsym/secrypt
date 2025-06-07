@@ -122,9 +122,18 @@ class _DashboardScreenState extends State<DashboardScreen>
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final data = docs[index].data() as Map<String, dynamic>;
+            final docId = docs[index].id;
+
             return ListTile(
               title: Text(data['image_title'] ?? 'Tanpa Judul'),
               subtitle: Text(formatTimestamp(data['timestamp'])),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/images/$docId',
+                  arguments: {'docId': docId},
+                );
+              },
             );
           },
         );
