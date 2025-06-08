@@ -24,6 +24,88 @@ class _DashboardScreenState extends State<DashboardScreen>
     loadUserData();
   }
 
+  Future<void> _deleteImage(String docId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text(
+              'Apakah Anda yakin ingin menghapus gambar ini?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('images')
+            .doc(docId)
+            .delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gambar berhasil dihapus')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Terjadi kesalahan saat menghapus gambar'),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteText(String docId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text(
+              'Apakah Anda yakin ingin menghapus text ini?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('texts')
+            .doc(docId)
+            .delete();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Text berhasil dihapus')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Terjadi kesalahan saat menghapus text'),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> loadUserData() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
@@ -80,12 +162,19 @@ class _DashboardScreenState extends State<DashboardScreen>
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final data = docs[index].data() as Map<String, dynamic>;
+            final docId = docs[index].id;
+
             return ListTile(
               title: Text(data['text_title'] ?? 'Tanpa Judul'),
               subtitle: Text(formatTimestamp(data['timestamp'])),
               onTap: () {
-                Navigator.pushNamed(context, '/texts/${docs[index].id}');
+                Navigator.pushNamed(context, '/texts/$docId');
               },
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed:
+                    () => _deleteText(docId), // ganti dengan fungsi penghapusmu
+              ),
             );
           },
         );
@@ -134,6 +223,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                   arguments: {'docId': docId},
                 );
               },
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed:
+                    () => _deleteImage(
+                      docId,
+                    ), // pastikan _deleteOrder menerima docId
+              ),
             );
           },
         );
