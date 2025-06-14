@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Email dan password tidak boleh kosong.'),
+        content: Text('Email & password tidak boleh kosong.'),
       ));
       return;
     }
