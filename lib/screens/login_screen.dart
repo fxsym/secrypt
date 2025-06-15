@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
     } on FirebaseAuthException catch (e) {
-      String message = 'Login gagal.';
+      String message = 'Login gagal, silahkan coba lagi.';
       if (e.code == 'user-not-found') {
         message = 'Pengguna tidak ditemukan.';
       } else if (e.code == 'wrong-password') {
