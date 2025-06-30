@@ -71,14 +71,18 @@ class _TextDetailScreenState extends State<TextDetailScreen> {
 
   String formatTimestamp(Timestamp timestamp) {
     final dateTime = timestamp.toDate();
-    final formatter = DateFormat('MMMM d, y \'at\' h:mm:ss a zzz');
+    final formatter = DateFormat('dd MMM yyyy, HH:mm');
     return formatter.format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail Teks Terenkripsi")),
+      appBar: AppBar(
+        title: Text("Detail Teks Terenkripsi"),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _textData,
         builder: (context, snapshot) {
@@ -92,55 +96,109 @@ class _TextDetailScreenState extends State<TextDetailScreen> {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           _encryptedText = data['encrypt_text'];
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Judul:", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(data['text_title'] ?? '-'),
-                  SizedBox(height: 10),
-                  Text(
-                    "Encrypt Text:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Judul",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  SelectableText(_encryptedText ?? '-'),
-                  SizedBox(height: 10),
-                  Text(
-                    "Timestamp:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4),
+                Text(data['text_title'] ?? '-'),
+                SizedBox(height: 16),
+
+                Text(
+                  "Teks Terenkripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  Text(
-                    data['timestamp'] != null
-                        ? formatTimestamp(data['timestamp'])
-                        : '-',
+                ),
+                SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    "Masukkan key untuk dekripsi data",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: SelectableText(_encryptedText ?? '-'),
+                ),
+                SizedBox(height: 16),
+
+                Text(
+                  "Waktu Enkripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  TextField(
-                    controller: _keyController,
-                    decoration: InputDecoration(labelText: 'Key (bebas panjang)'),
-                    obscureText: true,
+                ),
+                SizedBox(height: 4),
+                Text(
+                  data['timestamp'] != null
+                      ? formatTimestamp(data['timestamp'])
+                      : '-',
+                ),
+                SizedBox(height: 24),
+
+                Text(
+                  "Masukkan Key untuk Dekripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _keyController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Key Enkripsi',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.lock_open),
                     onPressed: _decryptText,
-                    child: Text('Dekripsi'),
-                  ),
-                  SizedBox(height: 20),
-                  if (_decryptedText != null) ...[
-                    Text(
-                      'Hasil Dekripsi:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    label: Text("Dekripsi"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    SelectableText(_decryptedText!),
-                  ],
+                  ),
+                ),
+                SizedBox(height: 24),
+
+                if (_decryptedText != null) ...[
+                  Text(
+                    'Hasil Dekripsi',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SelectableText(_decryptedText!),
+                  ),
                 ],
-              ),
+              ],
             ),
           );
         },

@@ -18,10 +18,9 @@ class ImageDetailScreen extends StatefulWidget {
 class _ImageDetailScreenState extends State<ImageDetailScreen> {
   late Future<DocumentSnapshot> _textData;
   final TextEditingController _keyController = TextEditingController();
-  String? base64Image;
-
   String? _encryptedImage;
   String? _decryptedImage;
+  bool _isDecryptionError = false;
 
   Uint8List _generateKeyFromPassword(String password) {
     return sha256.convert(utf8.encode(password)).bytes as Uint8List;
@@ -34,9 +33,9 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
     if (keyInput.isEmpty ||
         encryptedBase64 == null ||
         !encryptedBase64.contains(":")) {
-      setState(() {
-        _decryptedImage = "Key dan teks terenkripsi harus diisi!";
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Key dan teks terenkripsi harus diisi!")),
+      );
       return;
     }
 
@@ -55,10 +54,12 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
 
       setState(() {
         _decryptedImage = decrypted;
+        _isDecryptionError = false;
       });
     } catch (e) {
       setState(() {
         _decryptedImage = "Gagal dekripsi: key salah atau data rusak.";
+        _isDecryptionError = true;
       });
     }
   }
@@ -72,83 +73,136 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
 
   String formatTimestamp(Timestamp timestamp) {
     final dateTime = timestamp.toDate();
-    final formatter = DateFormat('MMMM d, y \'at\' h:mm:ss a zzz');
+    final formatter = DateFormat('dd MMM yyyy, HH:mm');
     return formatter.format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail Teks Terenkripsi")),
+      appBar: AppBar(
+        title: const Text("Detail Gambar Terenkripsi"),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _textData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return Center(child: Text('Data tidak ditemukan.'));
+            return const Center(child: Text('Data tidak ditemukan.'));
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
           _encryptedImage = data['encrypt_image'];
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Judul:", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(data['image_title'] ?? '-'),
-                  SizedBox(height: 10),
-                  Text(
-                    "Encrypt Image:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Judul",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  _decryptedImage != null
-                      ? Column(
-                        children: [
-                          Text(
-                            "Gambar berhasil di dekripsi",
-                            style: TextStyle(color: Colors.green),
-                          ),
-                          Image.memory(
-                            base64Decode(_decryptedImage!),
-                            fit: BoxFit.cover,
-                          ),
-                        ],
-                      )
-                      : Icon(Icons.image, size: 80, color: Colors.grey[600]),
-                  SizedBox(height: 10),
-                  Text(
-                    "Timestamp:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(data['image_title'] ?? '-'),
+                const SizedBox(height: 16),
+
+                Text(
+                  "Gambar Terenkripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  Text(
-                    data['timestamp'] != null
-                        ? formatTimestamp(data['timestamp'])
-                        : '-',
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    "Masukkan key untuk dekripsi data",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextField(
-                    controller: _keyController,
-                    decoration: InputDecoration(
-                      labelText: 'Key (bebas panjang)',
+                ),
+                const SizedBox(height: 8),
+
+                if (_decryptedImage != null && !_isDecryptionError)
+                  Column(
+                    children: [
+                      const Text(
+                        "Gambar berhasil di dekripsi",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                      const SizedBox(height: 8),
+                      Image.memory(
+                        base64Decode(_decryptedImage!),
+                        fit: BoxFit.cover,
+                      ),
+                    ],
+                  )
+                else if (_isDecryptionError)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    obscureText: true,
+                    child: Text(
+                      _decryptedImage!,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                else
+                  Icon(Icons.image, size: 80, color: Colors.grey[600]),
+
+                const SizedBox(height: 20),
+                Text(
+                  "Waktu Enkripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
                   ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  data['timestamp'] != null
+                      ? formatTimestamp(data['timestamp'])
+                      : '-',
+                ),
+                const SizedBox(height: 24),
+
+                Text(
+                  "Masukkan Key untuk Dekripsi",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _keyController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Key Enkripsi',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.lock_open),
                     onPressed: _decryptText,
-                    child: Text('Dekripsi'),
+                    label: const Text("Dekripsi Gambar"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

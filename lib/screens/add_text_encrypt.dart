@@ -83,41 +83,92 @@ class _AddTextEncryptScreenState extends State<AddTextEncryptScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Enkripsi Teks')),
-      body: Padding(
-        padding: EdgeInsets.all(16),
+      appBar: AppBar(
+        title: Text('Enkripsi Teks'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              "Masukkan Informasi",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade800,
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Judul teks enkripsi'),
+              decoration: InputDecoration(
+                labelText: 'Judul Teks Enkripsi',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _textController,
-              decoration: InputDecoration(labelText: 'Teks asli'),
+              decoration: InputDecoration(
+                labelText: 'Teks Asli',
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(),
+              ),
               minLines: 5,
-              maxLines: null, // Membuat tinggi mengikuti isi
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _keyController,
-              decoration: InputDecoration(labelText: 'Key (bebas panjang)'),
               obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Kunci Enkripsi',
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _encryptText,
-              child:
-                  _isLoading
-                      ? CircularProgressIndicator()
-                      : Text('Enkripsi dan Simpan'),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.lock),
+                onPressed: _isLoading ? null : _encryptText,
+                label: _isLoading
+                    ? CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : Text('Enkripsi & Simpan'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_encryptedText != null) ...[
               Text(
                 'Hasil Enkripsi:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SelectableText(_encryptedText!),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SelectableText(
+                  _encryptedText!,
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+              ),
             ],
           ],
         ),

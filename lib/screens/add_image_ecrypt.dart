@@ -35,10 +35,9 @@ class _AddImageEncryptScreenState extends State<AddImageEncryptScreen> {
       final fileSize = await file.length();
 
       if (fileSize > 2 * 1024 * 1024) {
-        // Jika lebih dari 2MB
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Ukuran gambar maksimal 2MB')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ukuran gambar maksimal 2MB')),
+        );
         return;
       }
 
@@ -109,67 +108,111 @@ class _AddImageEncryptScreenState extends State<AddImageEncryptScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Enkripsi Gambar')),
-      body: Padding(
-        padding: EdgeInsets.all(16),
+      appBar: AppBar(
+        title: Text('Enkripsi Gambar'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              "Masukkan Informasi",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade800,
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Judul teks enkripsi'),
+              decoration: InputDecoration(
+                labelText: 'Judul gambar terenkripsi',
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 20),
-            Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child:
-                      base64Image != null
-                          ? Image.memory(
-                            base64Decode(base64Image!),
-                            fit: BoxFit.cover,
-                          )
-                          : Icon(
-                            Icons.image,
-                            size: 80,
-                            color: Colors.grey[600],
-                          ),
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: pickImage,
-                  child: Text(
-                    base64Image == null ? "Pilih Gambar" : "Ganti Gambar",
-                  ),
-                ),
-              ],
+            const SizedBox(height: 20),
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade400),
+              ),
+              child: base64Image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(
+                        base64Decode(base64Image!),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    )
+                  : Center(
+                      child: Icon(Icons.image, size: 80, color: Colors.grey),
+                    ),
             ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: pickImage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              icon: Icon(Icons.upload),
+              label: Text(base64Image == null ? 'Pilih Gambar' : 'Ganti Gambar'),
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: _keyController,
-              decoration: InputDecoration(labelText: 'Key (bebas panjang)'),
               obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Kunci enkripsi',
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _encryptText,
-              child:
-                  _isLoading
-                      ? CircularProgressIndicator()
-                      : Text('Enkripsi dan Simpan'),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _encryptText,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text('Enkripsi & Simpan'),
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_encryptedImage != null) ...[
               Text(
                 'Hasil Enkripsi:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SelectableText(_encryptedImage!),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SelectableText(
+                  _encryptedImage!,
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+              ),
             ],
           ],
         ),
